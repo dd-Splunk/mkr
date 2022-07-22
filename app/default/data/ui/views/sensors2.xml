@@ -1,0 +1,138 @@
+<form>
+  <label>MKR - Sensors</label>
+  <description>MKR based data</description>
+  <fieldset submitButton="false" autoRun="true">
+    <input type="time" token="field1">
+      <label>Time Range</label>
+      <default>
+        <earliest>@d</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Temperature</title>
+      <single>
+        <search>
+          <query>| mstats avg(_value) prestats=true WHERE metric_name="*.temperature" AND index="mkr" span=auto BY board_id
+| lookup sensors.csv board_id OUTPUT board_name
+| timechart eval(round(avg(_value),2)) span=5m agg=max limit=5 useother=false BY board_name
+| fields - _span*</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="rangeColors">["0x006d9c","0x53a051","0xf8be34","0xdc4e41","0xdc4e41"]</option>
+        <option name="rangeValues">[0,19,25,35]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendInterval">-5m</option>
+        <option name="unit">°C</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Humidity</title>
+      <single>
+        <search>
+          <query>| mstats avg(_value) prestats=true WHERE metric_name="*.humidity" AND index="mkr" span=auto BY board_id 
+| lookup sensors.csv board_id OUTPUT board_name
+| timechart eval(round(avg(_value),2)) span=5m agg=max limit=5 useother=false BY board_name
+| fields - _span*</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0xf8be34","0xf8be34","0x53a051","0x006d9c","0x555"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendInterval">-5m</option>
+        <option name="unit">%</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Air Quality</title>
+      <single>
+        <search>
+          <query>| mstats avg(_value) prestats=true WHERE (metric_name="sensor.AirQuality" OR metric_name="air.quality") AND index="mkr"  span=5m BY board_id | lookup sensors.csv board_id OUTPUT board_name
+| timechart avg(_value) span=5m agg=max limit=5 useother=false BY board_name
+| fields - _span*</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendInterval">-5m</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Illuminance</title>
+      <single>
+        <search>
+          <query>| mstats avg(_value) prestats=true WHERE metric_name="*.illuminance" AND index="mkr" span=auto BY board_id
+| lookup sensors.csv board_id OUTPUT board_name
+| timechart eval(round(avg(_value),2)) span=5m agg=max limit=5 useother=false BY board_name
+| fields - _span*</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendInterval">-5m</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Pressure by location</title>
+      <single>
+        <search>
+          <query>| mstats avg(_value) prestats=true WHERE metric_name="*.pressure" AND index="mkr" span=auto BY board_id
+| lookup sensors.csv board_id OUTPUT board_name, board_location
+| timechart avg(_value) span=5m agg=max limit=5 useother=false BY board_location
+| fields - _span*</query>
+          <earliest>$field1.earliest$</earliest>
+          <latest>$field1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">1</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="unit">hPa</option>
+        <option name="useThousandSeparators">0</option>
+      </single>
+    </panel>
+  </row>
+</form>
