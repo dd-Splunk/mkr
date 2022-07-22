@@ -1,4 +1,4 @@
-<form>
+<form version="1.1">
   <label>MKR - Sensors</label>
   <description>MKR based data</description>
   <fieldset submitButton="false" autoRun="true">
